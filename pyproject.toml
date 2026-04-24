@@ -1,0 +1,10 @@
+[project]
+name = "omics-rag-playground"
+version = "0.1.0"
+description = "AI-assisted workbench for interpreting bulk RNA-seq differential expression results."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+authors = [
+    { name = "Emanuele Dri", email = "emanueledri1997@gmail.com" }
+]

@@ -16,6 +16,24 @@ This is a portfolio project, built in the open as I transition from quantum comp
 
 ---
 
+## Preview
+
+Stage 0 warm-up on the `airway` dataset (Himes et al. 2014):
+
+<p align="center">
+  <img src="docs/img/volcano_airway.png" width="600" alt="Volcano plot">
+  <br>
+  <em>Volcano plot of dexamethasone vs control. Annotated genes are well-known glucocorticoid-responsive markers (ZBTB16, FKBP5, PER1, DUSP1).</em>
+</p>
+
+<p align="center">
+  <img src="docs/img/pca_airway.png" width="500" alt="PCA on VST counts">
+  <br>
+  <em>PCA on VST-transformed counts: PC1 (29.2%) cleanly separates treatment groups; PC2 (23.1%) captures donor-level variability.</em>
+</p>
+
+---
+
 ## Roadmap
 
 - [x] **Stage 0 — Foundations**
@@ -77,7 +95,7 @@ omics-rag-playground/
 │   ├── 00_warmup_airway.ipynb
 │   └── 01_de_analysis_gse50760.ipynb
 ├── src/
-│   └── omics-rag-playground/
+│   └── omics_rag_playground/
 ├── tests/
 ├── pyproject.toml
 └── README.md

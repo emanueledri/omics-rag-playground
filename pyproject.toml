@@ -4,7 +4,16 @@ version = "0.1.0"
 description = "AI-assisted workbench for interpreting bulk RNA-seq differential expression results."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "mygene>=3.2.2",
+    "pydeseq2>=0.5.4",
+    "seaborn>=0.13.2",
+]
 authors = [
     { name = "Emanuele Dri", email = "emanueledri1997@gmail.com" }
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.2.0",
 ]

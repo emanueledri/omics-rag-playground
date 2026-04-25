@@ -23,7 +23,7 @@ Stage 0 warm-up on the `airway` dataset (Himes et al. 2014):
 <p align="center">
   <img src="docs/img/volcano_airway.png" width="600" alt="Volcano plot">
   <br>
-  <em>Volcano plot of dexamethasone vs control. Annotated genes are well-known glucocorticoid-responsive markers (ZBTB16, FKBP5, PER1, DUSP1).</em>
+  <em>Volcano plot of dexamethasone vs control.</em>
 </p>
 
 <p align="center">

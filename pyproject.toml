@@ -9,6 +9,7 @@ dependencies = [
     "gseapy==1.1",
     "mygene>=3.2.2",
     "pydeseq2>=0.5.4",
+    "python-dotenv>=1.2.2",
     "seaborn>=0.13.2",
 ]
 authors = [
@@ -27,3 +28,8 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/omics_rag_playground"]
+
+[tool.pytest.ini_options]
+markers = [
+    "network: marks tests that hit external APIs (deselect with '-m \"not network\"')",
+]

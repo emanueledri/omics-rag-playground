@@ -5,6 +5,7 @@ description = "AI-assisted workbench for interpreting bulk RNA-seq differential 
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "biopython>=1.87",
     "gseapy==1.1",
     "mygene>=3.2.2",
     "pydeseq2>=0.5.4",

@@ -1,6 +1,6 @@
 # Design notes
 
-## Session 1 (2026-04-25)
+## Session 1: warm-up DE on airway
 
 **What worked**
 - pyDESeq2 single-factor design ran clean on airway
@@ -69,3 +69,37 @@ promote it to `src/`.
   GSE50760. Could add a heatmap of top 30 DE genes from the multi-
   factor model with samples annotated by patient + condition — would 
   visually demonstrate the patient-blocking effect. Low priority.
+
+## Session 3: RAG retrieval + embedding scaffold
+
+### Retrieval primitive design
+[breve riassunto delle decisioni: Biopython, dataclass, cache by PMID, 
+fixture-based testing for parser branches]
+
+### Notable finding from notebook 02
+Two of the top-5 up-regulated DE genes (SERPINB7, DNMT3L) returned 
+zero CRC abstracts under a Title/Abstract + MeSH Major Topic query.
+Independent of retrieval quality, this is a real signal: top-LFC 
+genes that are absent from CRC literature are candidate "novel" 
+hits and arguably the most interesting cases for the downstream 
+reasoning layer to flag explicitly.
+
+### embedding model selection
+
+- Embeddings are L2-normalized at encode time (`normalize_embeddings=True`):
+  cosine similarity reduces to dot product downstream, and ChromaDB's
+  default L2 distance becomes rank-equivalent to cosine.
+
+Chose NeuML/pubmedbert-base-embeddings over alternatives. Rationale:
+- Sentence-transformers compatible (drop-in via SentenceTransformer 
+  class), 110M params, 768-dim, Apache 2.0, ~600 docs/sec on CPU.
+- Trained directly on PubMed title-abstract pairs (proper sentence-
+  level contrastive training, unlike vanilla PubMedBERT/BioBERT 
+  which are MLM-only and produce poor retrieval embeddings).
+- BMRetriever-410M would offer ~+8% on biomedical BEIR but requires 
+  custom loading + LLM-style pooling — deferred as upgrade path.
+- General-purpose alternatives (all-mpnet-base-v2, BGE) trail 
+  biomedical fine-tunes by 5-15% on BEIR biomedical subsets.
+
+Sanity check confirmed: cosine(BEST4, OTOP2) > cosine(BEST4, IL-2 
+control), with a margin of 0.48. 

@@ -18,7 +18,7 @@ This is a portfolio project, built in the open as I transition from quantum comp
 
 ## Preview
 
-Stage 0 warm-up on the `airway` dataset (Himes et al. 2014):
+**Stage 0 warm-up on the `airway` dataset** (Himes et al. 2014):
 
 <p align="center">
   <img src="docs/img/volcano_airway.png" width="600" alt="Volcano plot">
@@ -32,6 +32,20 @@ Stage 0 warm-up on the `airway` dataset (Himes et al. 2014):
   <em>PCA on VST-transformed counts: PC1 (29.2%) cleanly separates treatment groups; PC2 (23.1%) captures donor-level variability.</em>
 </p>
 
+**Stage 1 — colorectal cancer DE on GSE50760** (Kim et al. 2014, via recount3):
+
+<p align="center">
+  <img src="docs/img/pca_gse50760.png" width="600" alt="GSE50760 PCA">
+  <br>
+  <em>PCA on VST counts. PC1 separates colon-derived from liver-derived samples; tumor and normal overlap within the colon cluster, motivating the multi-factor design.</em>
+</p>
+
+<p align="center">
+  <img src="docs/img/volcano_gse50760_multifactor.png" width="600" alt="GSE50760 volcano">
+  <br>
+  <em>Tumor vs normal under <code>~patient + condition</code>. The downregulated colonic-differentiation markers (BEST4, OTOP2, CA7) emerge as top hits, masked by the simpler design.</em>
+</p>
+
 ---
 
 ## Roadmap
@@ -39,10 +53,11 @@ Stage 0 warm-up on the `airway` dataset (Himes et al. 2014):
 - [x] **Stage 0 — Foundations**
   - Warm-up on the `airway` reference dataset
   - Repo scaffolding, dependencies pinned via `uv`
-- [ ] **Stage 1 — DE analysis on a real dataset**
-  - GSE50760 (colorectal cancer: primary tumor, normal mucosa, liver metastasis)
-  - QC, normalization, PCA, DESeq2 run, volcano plot, top-genes heatmap
-  - Pathway enrichment with `gseapy` (GSEA + ORA)
+- [x] **Stage 1 — DE analysis on a real dataset**
+  - GSE50760 (colorectal cancer: primary tumor, normal mucosa, liver metastasis) via recount3
+  - Single-factor and multi-factor (`~patient + condition`) designs in parallel
+  - Volcano plots, exploratory PCA on VST counts, pathway enrichment (Hallmarks)
+  - Documented liver-tissue confound in the metastasis-vs-tumor contrast
 - [ ] **Stage 2 — Retrieval layer**
   - PubMed abstract ingestion (Entrez API) scoped to dataset keywords
   - Bio-aware embeddings (PubMedBERT / BioBERT) + vector store (Chroma/FAISS)

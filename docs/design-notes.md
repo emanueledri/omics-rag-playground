@@ -103,3 +103,40 @@ Chose NeuML/pubmedbert-base-embeddings over alternatives. Rationale:
 
 Sanity check confirmed: cosine(BEST4, OTOP2) > cosine(BEST4, IL-2 
 control), with a margin of 0.48. 
+
+### MeSH enrichment ablation
+
+Tested whether appending MeSH Major Topics to the embedded text 
+("title + abstract + 'MeSH: t1; t2; ...'") improves retrieval over 
+title + abstract alone. Compared on 3 query types (topic-level, 
+gene+function, mechanism-specific) with the same abstract corpus.
+
+A/B compared two embedding strategies on the same abstract corpus 
+and three demo queries: title + abstract (baseline) vs title + 
+abstract + "MeSH: t1; t2; ...".
+
+Result: null effect. Top-5 retrieved PMIDs identical or nearly so, 
+distance shifts in the 0.001-0.02 range, occasional rank swaps 
+that don't change the substantive interpretation.
+
+Decision: drop MeSH appending for Stage 3. Keep title + abstract.
+
+Why null: (a) PubMedBERT pre-training already encodes MeSH ontology, 
+(b) the retrieval query enforces "Colorectal Neoplasms" Major Topic 
+on every abstract, making it a constant feature, (c) abstract text 
+already contains the discriminative vocabulary.
+
+This is a useful negative result: a portfolio-level ablation study 
+that motivates a simpler chunking strategy and saves token budget 
+in downstream Stage 3 reasoning.
+
+### Deduplication before vector store ingest
+
+Some PubMed records appear multiple times in our flat list because they 
+match queries for multiple genes (e.g. a single-cell colon paper hits 
+both BEST4 and OTOP2 queries). We deduplicate by PMID before ingest, 
+collapsing the gene-of-origin into a "; "-separated string. This ensures 
+each abstract appears once in retrieval results, at the cost of losing 
+single-gene filterability — acceptable since gene-of-origin is recoverable 
+from the original flat lists when needed.
+

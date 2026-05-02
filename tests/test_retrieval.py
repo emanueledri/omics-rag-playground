@@ -44,7 +44,15 @@ def test_parse_record_with_collective_authors():
 def test_cache_roundtrip(tmp_path):
     cache_file = tmp_path / "cache.json"
     record = PubMedRecord(pmid="123", title="...", abstract="...", 
-                          authors=[], journal="...", year=2020, doi=None)
+                          authors=[], journal="...", year=2020, 
+                          doi=None, mesh_major_topics=["test topic"])
     _save_cache(cache_file, {"123": record})
     loaded = _load_cache(cache_file)
     assert loaded["123"] == record  # dataclass __eq__ works out of the box
+
+def test_parse_extracts_major_topics():
+    xml_bytes = (FIXTURES / "pubmed_structured_abstract_29335749.xml").read_bytes()
+    records = Entrez.read(BytesIO(xml_bytes))
+    parsed = _parse_pubmed_record(records['PubmedArticle'][0])
+    assert isinstance(parsed.mesh_major_topics, list)
+    assert all(isinstance(t, str) for t in parsed.mesh_major_topics)

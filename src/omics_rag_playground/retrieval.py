@@ -28,6 +28,7 @@ class PubMedRecord:
     year: int | None
     doi: str | None
     journal: str
+    mesh_major_topics: list[str] 
 
 def fetch_pubmed_abstracts(
     query: str,
@@ -157,6 +158,13 @@ def _parse_pubmed_record(article: dict) -> PubMedRecord:
 
     journal = str(article_data.get("Journal", {}).get("Title", ""))
 
+    mesh_list = medline.get("MeshHeadingList", [])
+    mesh_major_topics = [
+        str(mesh["DescriptorName"])
+        for mesh in mesh_list
+        if mesh["DescriptorName"].attributes.get("MajorTopicYN") == "Y"
+    ]
+
     record = PubMedRecord(
         pmid=pmid,
         title=title,
@@ -165,6 +173,7 @@ def _parse_pubmed_record(article: dict) -> PubMedRecord:
         year=year,
         doi=doi,
         journal=journal,
+        mesh_major_topics=mesh_major_topics
     )
 
     return record

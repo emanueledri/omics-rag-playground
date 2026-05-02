@@ -58,7 +58,7 @@ This is a portfolio project, built in the open as I transition from quantum comp
   - Single-factor and multi-factor (`~patient + condition`) designs in parallel
   - Volcano plots, exploratory PCA on VST counts, pathway enrichment (Hallmarks)
   - Documented liver-tissue confound in the metastasis-vs-tumor contrast
-- [ ] **Stage 2 — Retrieval layer**
+- [x] **Stage 2 — Retrieval layer**
   - PubMed abstract ingestion (Entrez API) scoped to dataset keywords
   - Bio-aware embeddings (PubMedBERT / BioBERT) + vector store (Chroma/FAISS)
   - Gene-annotation hooks (MyGene, GeneCards)

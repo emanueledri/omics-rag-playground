@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "biopython>=1.87",
+    "chromadb>=1.5.8",
     "gseapy==1.1",
     "mygene>=3.2.2",
     "pydeseq2>=0.5.4",

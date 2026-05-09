@@ -1,0 +1,140 @@
+"""Tests for the reasoning module."""
+
+from __future__ import annotations
+
+import chromadb
+import pytest
+from langchain_core.messages import AIMessage
+
+from omics_rag_playground import reasoning
+from omics_rag_playground.embeddings import embed_abstracts
+
+
+# --- Fixtures ---------------------------------------------------------------
+
+
+@pytest.fixture
+def populated_collection():
+    """Build an in-memory ChromaDB collection with 3 toy abstracts.
+
+    The abstracts are short and gene-themed so the embedding model produces
+    meaningful (if low-quality) similarities. Sufficient for structural tests.
+    """
+    client = chromadb.EphemeralClient()
+    collection = client.create_collection(
+        name="test_pubmed_abstracts",
+        metadata={"hnsw:space": "cosine"},
+    )
+
+    docs = [
+        {
+            "pmid": "10000001",
+            "title": "BEST4 marker of colonic differentiation",
+            "abstract": (
+                "BEST4 is a calcium-activated chloride channel expressed in "
+                "a rare population of colonic epithelial cells. Its expression "
+                "marks differentiated absorptive enterocytes in normal colon."
+            ),
+        },
+        {
+            "pmid": "10000002",
+            "title": "OTOP2 in colorectal cancer",
+            "abstract": (
+                "OTOP2 encodes a proton-selective ion channel and is "
+                "downregulated in colorectal tumors compared to matched normal "
+                "mucosa. Loss of OTOP2 is a marker of dedifferentiation."
+            ),
+        },
+        {
+            "pmid": "10000003",
+            "title": "Carbonic anhydrase 7 expression in colon",
+            "abstract": (
+                "Carbonic anhydrase 7 (CA7) is highly expressed in normal "
+                "colonic epithelium and significantly reduced in colorectal "
+                "cancer tissue, suggesting a role in tumor suppression."
+            ),
+        },
+    ]
+
+    texts = [f"{d['title']}\n\n{d['abstract']}" for d in docs]
+    embeddings = embed_abstracts(texts).tolist()
+
+    collection.add(
+        ids=[d["pmid"] for d in docs],
+        documents=texts,
+        embeddings=embeddings,
+        metadatas=[{"pmid": d["pmid"], "title": d["title"]} for d in docs],
+    )
+
+    yield collection
+    client.delete_collection("test_pubmed_abstracts")
+
+
+# --- Offline structural tests -----------------------------------------------
+
+
+def test_answer_question_end_to_end(populated_collection, monkeypatch):
+    """Full pipeline runs with a stubbed LLM and a local collection."""
+
+    class StubLLM:
+        def invoke(self, prompt):
+            return AIMessage(content="stubbed answer")
+
+    monkeypatch.setattr(reasoning, "_get_llm", lambda model=None: StubLLM())
+
+    result = reasoning.answer_question(
+        query="What is BEST4 in colonic epithelium?",
+        collection=populated_collection,
+        n_retrieved=3,
+    )
+
+    assert result.answer == "stubbed answer"
+    assert len(result.retrieved_pmids) == 3
+    assert len(result.retrieved_distances) == 3
+    assert all(isinstance(p, str) for p in result.retrieved_pmids)
+    assert all(isinstance(d, float) for d in result.retrieved_distances)
+    # Block 1: structured fields are not yet populated
+    assert result.citations is None
+    assert result.confidence is None
+
+
+def test_retrieved_pmids_are_from_collection(populated_collection, monkeypatch):
+    """Retrieved PMIDs must be a subset of what was ingested."""
+
+    class StubLLM:
+        def invoke(self, prompt):
+            return AIMessage(content="stubbed")
+
+    monkeypatch.setattr(reasoning, "_get_llm", lambda model=None: StubLLM())
+
+    result = reasoning.answer_question(
+        query="colonic differentiation",
+        collection=populated_collection,
+        n_retrieved=2,
+    )
+
+    expected_pmids = {"10000001", "10000002", "10000003"}
+    assert set(result.retrieved_pmids).issubset(expected_pmids)
+    assert len(result.retrieved_pmids) == 2
+
+
+# --- Live smoke test --------------------------------------------------------
+
+
+@pytest.mark.network
+def test_answer_question_live_smoke(populated_collection):
+    """End-to-end call against the real Anthropic API.
+
+    Requires ANTHROPIC_API_KEY in the environment. Skipped by default in CI;
+    run explicitly with `pytest -m network`.
+    """
+    result = reasoning.answer_question(
+        query="What is BEST4 in colonic epithelium?",
+        collection=populated_collection,
+        n_retrieved=3,
+    )
+
+    assert isinstance(result.answer, str)
+    assert len(result.answer) > 0
+    assert len(result.retrieved_pmids) == 3
+#   assert False, f"Answer was: {result.answer}"

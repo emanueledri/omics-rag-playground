@@ -8,6 +8,7 @@ dependencies = [
     "biopython>=1.87",
     "chromadb>=1.5.8",
     "gseapy==1.1",
+    "langchain-anthropic>=1.4.3",
     "mygene>=3.2.2",
     "pydeseq2>=0.5.4",
     "python-dotenv>=1.2.2",

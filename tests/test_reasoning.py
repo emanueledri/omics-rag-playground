@@ -8,6 +8,7 @@ from langchain_core.messages import AIMessage
 
 from omics_rag_playground import reasoning
 from omics_rag_playground.embeddings import embed_abstracts
+from omics_rag_playground.reasoning import GroundedAnswer
 
 
 # --- Fixtures ---------------------------------------------------------------
@@ -77,8 +78,15 @@ def test_answer_question_end_to_end(populated_collection, monkeypatch):
     """Full pipeline runs with a stubbed LLM and a local collection."""
 
     class StubLLM:
-        def invoke(self, prompt):
-            return AIMessage(content="stubbed answer")
+        def with_structured_output(self, schema):
+            return self  # so .invoke returns GroundedAnswer below
+        def invoke(self, messages):
+            return GroundedAnswer(
+                answer="stubbed answer",
+                citations=["10000001"],
+                confidence="moderate",
+                reasoning_type="function",
+            )
 
     monkeypatch.setattr(reasoning, "_get_llm", lambda model=None: StubLLM())
 
@@ -93,17 +101,24 @@ def test_answer_question_end_to_end(populated_collection, monkeypatch):
     assert len(result.retrieved_distances) == 3
     assert all(isinstance(p, str) for p in result.retrieved_pmids)
     assert all(isinstance(d, float) for d in result.retrieved_distances)
-    # Block 1: structured fields are not yet populated
-    assert result.citations is None
-    assert result.confidence is None
+    assert result.citations == ["10000001"]
+    assert result.confidence == "moderate"
+    assert result.reasoning_type == "function"
 
 
 def test_retrieved_pmids_are_from_collection(populated_collection, monkeypatch):
     """Retrieved PMIDs must be a subset of what was ingested."""
 
     class StubLLM:
-        def invoke(self, prompt):
-            return AIMessage(content="stubbed")
+        def with_structured_output(self, schema):
+            return self
+        def invoke(self, messages):
+            return GroundedAnswer(
+                answer="stubbed answer",
+                citations=["10000001"],
+                confidence="moderate",
+                reasoning_type="function",
+            )
 
     monkeypatch.setattr(reasoning, "_get_llm", lambda model=None: StubLLM())
 
@@ -134,7 +149,8 @@ def test_answer_question_live_smoke(populated_collection):
         n_retrieved=3,
     )
 
+    # print(f"\n{result}")
+
     assert isinstance(result.answer, str)
     assert len(result.answer) > 0
     assert len(result.retrieved_pmids) == 3
-#   assert False, f"Answer was: {result.answer}"

@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from functools import lru_cache
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage, SystemMessage
+from pydantic import BaseModel, Field
 from typing import Literal
 import os
 
@@ -19,41 +19,87 @@ class ReasoningResult:
     retrieved_distances: list[float]
     citations: list[str] | None = None
     confidence: Literal['high', 'moderate', 'low', 'none'] | None = None
+    reasoning_type: Literal['topic', 'function', 'mechanism'] | None = None
 
-_SYSTEM_PROMPT = "You are a biomedical research assistant. Answer the user's question using only the abstracts provided. Be concise."
+_SYSTEM_PROMPT = """You are a biomedical research assistant for gene-disease \
+question answering grounded in PubMed abstracts.
+
+Grounding rule:
+Answer the user's question using only the provided abstracts. \
+Do not use external knowledge. Do not speculate beyond what the abstracts state.
+
+Reasoning type:
+Classify the question as one of:
+- topic: which genes or papers are associated with a phenomenon
+- function: what a specific gene does
+- mechanism: how something happens, requiring chains of causal steps
+
+Confidence levels:
+- high: multiple abstracts directly answer the question with consistent evidence
+- moderate: abstracts answer the question partially, or evidence is consistent but limited (e.g. single abstract)
+- low: abstracts only tangentially address the question, requiring inference
+- none: abstracts do not contain information to answer the question
+
+Citation rule:
+The citations field must contain all and only the PMIDs of the abstracts you \
+used to support your answer. No PMIDs of abstracts you did not use. No claims \
+without a corresponding PMID in citations.
+"""
+
+_USER_TEMPLATE = """<abstracts>
+{formatted_abstracts}
+</abstracts>
+
+Question: {query}"""
+
+class GroundedAnswer(BaseModel):
+    """Internal schema for the LLM structured output."""
+    
+    answer: str = Field(description="Answer to the user's question, grounded in the provided abstracts.")
+    citations: list[str] = Field(description="PMIDs of abstracts that support the answer. Empty list if no abstract supports the answer.")
+    confidence: Literal["high", "moderate", "low", "none"] = Field(description="Confidence level based on the strength of evidence in the cited abstracts.")
+    reasoning_type: Literal["topic", "function", "mechanism"] = Field(description="Classification of the question type.")
 
 @lru_cache(maxsize=4)
 def _get_llm(model: str = "claude-haiku-4-5-20251001") -> ChatAnthropic:
     """Get the LLM instance."""
     return ChatAnthropic(model_name=model, api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-def _format_abstracts(records) -> str:
+def _format_abstracts(records: list[dict]) -> str:
     """Format the abstracts for the LLM XML-like input."""
     formatted_abstracts = []
     for record in records:
         pmid = record.get("pmid", "unknown")
         title = record.get("title", "No title")
         abstract = record.get("abstract", "No abstract")
-        formatted_abstracts.append(f"<abstracts'><abstract><pmid>{pmid}</pmid><title>{title}</title><content>{abstract}</content></abstract></abstracts>")
-    return formatted_abstracts
+        formatted_abstracts.append(f"<abstract><pmid>{pmid}</pmid><title>{title}</title><content>{abstract}</content></abstract>")
+    return "\n".join(formatted_abstracts)
 
 def answer_question(query: str, collection, n_retrieved: int = 5, model: str = "claude-haiku-4-5-20251001") -> ReasoningResult:
     """Answer a question using the retrieved abstracts."""
-    llm = _get_llm(model)
+  
     retrieved = query_collection(collection, query, embed_fn=embed_abstracts, n_results=n_retrieved)
     retrieved_pmids = [r[0] for r in retrieved]
     retrieved_distances = [r[3] for r in retrieved]
 
     # construct the prompt with the XML block
     formatted_abstracts = _format_abstracts([{**r[2], "abstract": r[1]} for r in retrieved])
-    text_prompt = f"""<question>{query}</question>{''.join(formatted_abstracts)}"""
+    text_prompt = _USER_TEMPLATE.format(formatted_abstracts=formatted_abstracts, query=query)
 
-    # wrap prompt in BaseMessage format for langchain
-    messages = [SystemMessage(content=_SYSTEM_PROMPT), HumanMessage(content=text_prompt)]
-    response = llm.invoke(messages)
+    llm = _get_llm(model)
+    structured_llm = llm.with_structured_output(GroundedAnswer)
+
+    grounded_response = structured_llm.invoke([
+        ("system", _SYSTEM_PROMPT),
+        ("user", text_prompt),
+    ])
 
     return ReasoningResult(
-        answer=response.content,
+        answer=grounded_response.answer,
         retrieved_pmids=retrieved_pmids,
         retrieved_distances=retrieved_distances,
+        citations=grounded_response.citations,
+        confidence=grounded_response.confidence,
+        reasoning_type=grounded_response.reasoning_type,
     )
+

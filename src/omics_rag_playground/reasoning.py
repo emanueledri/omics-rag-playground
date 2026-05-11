@@ -29,10 +29,10 @@ Answer the user's question using only the provided abstracts. \
 Do not use external knowledge. Do not speculate beyond what the abstracts state.
 
 Reasoning type:
-Classify the question as one of:
-- topic: which genes or papers are associated with a phenomenon
-- function: what a specific gene does
-- mechanism: how something happens, requiring chains of causal steps
+Classify the question by what is being asked, not by the content of the abstracts:
+- topic: questions asking *which* genes/papers/conditions are associated with a phenomenon ("Which genes are involved in X?")
+- function: questions asking *what* a specific gene does ("What is the role of gene X?")
+- mechanism: questions asking *how* something happens, requiring causal chains
 
 Confidence levels:
 - high: multiple abstracts directly answer the question with consistent evidence
@@ -83,7 +83,7 @@ def answer_question(query: str, collection, n_retrieved: int = 5, model: str = "
     retrieved_distances = [r[3] for r in retrieved]
 
     # construct the prompt with the XML block
-    formatted_abstracts = _format_abstracts([{**r[2], "abstract": r[1]} for r in retrieved])
+    formatted_abstracts = _format_abstracts([{"pmid": pmid, **r[2], "abstract": r[1]} for pmid, r in zip(retrieved_pmids, retrieved)])
     text_prompt = _USER_TEMPLATE.format(formatted_abstracts=formatted_abstracts, query=query)
 
     llm = _get_llm(model)

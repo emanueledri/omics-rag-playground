@@ -52,6 +52,12 @@ _USER_TEMPLATE = """<abstracts>
 
 Question: {query}"""
 
+_FALLBACK_MESSAGE = (
+    "No relevant literature was found in the corpus for this query. "
+    "Either the retrieval returned no abstracts, or all retrieved abstracts "
+    "are too dissimilar from the query to provide reliable grounding."
+)
+
 class GroundedAnswer(BaseModel):
     """Internal schema for the LLM structured output."""
     
@@ -75,8 +81,26 @@ def _format_abstracts(records: list[dict]) -> str:
         formatted_abstracts.append(f"<abstract><pmid>{pmid}</pmid><title>{title}</title><content>{abstract}</content></abstract>")
     return "\n".join(formatted_abstracts)
 
-def answer_question(query: str, collection, n_retrieved: int = 5, model: str = "claude-haiku-4-5-20251001") -> ReasoningResult:
-    """Answer a question using the retrieved abstracts."""
+def answer_question(query: str, collection, n_retrieved: int = 5, 
+                    distance_threshold: float = 1.15, model: str = "claude-haiku-4-5-20251001") -> ReasoningResult:
+    """Answer a question using the retrieved abstracts.
+
+    Parameters
+    ----------
+    query : str
+        User question.
+    collection
+        ChromaDB collection of biomedical abstracts.
+    n_retrieved : int
+        Number of abstracts to retrieve from the collection.
+    model : str
+        Anthropic model name.
+    distance_threshold : float
+        Cosine distance threshold for the literature-sparse fallback.
+        If all retrieved abstracts have distance above this, the LLM call
+        is skipped and a "no relevant literature" message is returned.
+        Baseline 1.10 calibrated on the Stage 2 / Block 3 demo queries.
+    """
   
     retrieved = query_collection(collection, query, embed_fn=embed_abstracts, n_results=n_retrieved)
     retrieved_pmids = [r[0] for r in retrieved]
@@ -85,6 +109,17 @@ def answer_question(query: str, collection, n_retrieved: int = 5, model: str = "
     # construct the prompt with the XML block
     formatted_abstracts = _format_abstracts([{"pmid": pmid, **r[2], "abstract": r[1]} for pmid, r in zip(retrieved_pmids, retrieved)])
     text_prompt = _USER_TEMPLATE.format(formatted_abstracts=formatted_abstracts, query=query)
+
+    # Check if we should trigger the fallback before calling the LLM
+    if _should_trigger_fallback(retrieved_distances, distance_threshold):
+        return ReasoningResult(
+            answer=_FALLBACK_MESSAGE,
+            retrieved_pmids=retrieved_pmids,
+            retrieved_distances=retrieved_distances,
+            citations=[],
+            confidence="none",
+            reasoning_type=None,
+        )
 
     llm = _get_llm(model)
     structured_llm = llm.with_structured_output(GroundedAnswer)
@@ -102,4 +137,29 @@ def answer_question(query: str, collection, n_retrieved: int = 5, model: str = "
         confidence=grounded_response.confidence,
         reasoning_type=grounded_response.reasoning_type,
     )
+
+
+def _should_trigger_fallback(retrieved_distances: list[float], distance_threshold: float) -> bool:
+    """Decide whether to short-circuit the LLM call.
+    
+    Two conditions trigger the fallback:
+    - Empty retrieval (no abstracts returned at all)
+    - All retrieved abstracts have cosine distance above threshold,
+      indicating the corpus does not contain relevant literature.
+    
+    Parameters
+    ----------
+    retrieved_distances : list[float]
+        Cosine distances of retrieved abstracts, ordered ascending.
+    distance_threshold : float
+        Maximum cosine distance considered relevant.
+    
+    Returns
+    -------
+    bool
+        True if the fallback should be triggered.
+    """
+    if len(retrieved_distances) == 0 or all(d > distance_threshold for d in retrieved_distances):
+        return True
+    return False
 

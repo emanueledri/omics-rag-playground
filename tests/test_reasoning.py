@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import chromadb
 import pytest
+from dotenv import load_dotenv
 from langchain_core.messages import AIMessage
+
+load_dotenv()
 
 from omics_rag_playground import reasoning
 from omics_rag_playground.embeddings import embed_abstracts
-from omics_rag_playground.reasoning import GroundedAnswer
+from omics_rag_playground.reasoning import GroundedAnswer, _should_trigger_fallback
 
 
 # --- Fixtures ---------------------------------------------------------------
@@ -154,3 +157,47 @@ def test_answer_question_live_smoke(populated_collection):
     assert isinstance(result.answer, str)
     assert len(result.answer) > 0
     assert len(result.retrieved_pmids) == 3
+
+# --- Fallback trigger tests -------------------------------------------------
+
+
+def test_fallback_triggers_on_empty_retrieval():
+    """Empty retrieval should trigger the fallback regardless of threshold."""
+    assert _should_trigger_fallback([], distance_threshold=1.10) is True
+
+
+def test_fallback_triggers_when_all_distances_above_threshold():
+    """All distances above threshold should trigger the fallback."""
+    distances = [1.11, 1.15, 1.20]
+    assert _should_trigger_fallback(distances, distance_threshold=1.10) is True
+
+
+def test_fallback_does_not_trigger_when_any_distance_below_threshold():
+    """At least one distance below threshold should bypass the fallback."""
+    distances = [1.09, 1.15, 1.20]
+    assert _should_trigger_fallback(distances, distance_threshold=1.10) is False
+
+
+def test_fallback_short_circuits_llm(populated_collection, monkeypatch):
+    """When fallback triggers, the LLM should not be called."""
+    
+    class ExplodingStubLLM:
+        def with_structured_output(self, schema):
+            return self
+        def invoke(self, messages):
+            raise AssertionError("LLM should not be called when fallback triggers")
+    
+    monkeypatch.setattr(reasoning, "_get_llm", lambda model=None: ExplodingStubLLM())
+    
+    # Threshold = 0.0 forces all distances above threshold → fallback triggers.
+    result = reasoning.answer_question(
+        query="anything",
+        collection=populated_collection,
+        n_retrieved=3,
+        distance_threshold=0.0,
+    )
+    
+    assert result.confidence == "none"
+    assert result.citations == []
+    assert result.reasoning_type is None
+    assert "No relevant literature" in result.answer

@@ -2,15 +2,15 @@
 
 > An AI-assisted workbench for interpreting bulk RNA-seq differential expression results.
 
-**Status:**  Work in progress — foundations (normalization + DE + enrichment). RAG layer and Shiny frontend coming.
+**Status:** Work in progress. Foundations (normalization, DE, enrichment) and the RAG layer (retrieval, reasoning with citations) are in place. R Shiny frontend coming.
 
 ---
 
 ## Motivation
 
-Interpreting the output of a bulk RNA-seq differential expression analysis — a table of thousands of genes with log fold changes, p-values, and pathway annotations — is cognitively expensive. Biologists spend hours reading papers to contextualize a handful of candidate genes and deciding which leads to pursue. Pathway enrichment tools help, but they return more lists; they don't *explain*.
+Interpreting the output of a bulk RNA-seq differential expression analysis, a table of thousands of genes with log fold changes, p-values, and pathway annotations, is cognitively expensive. Biologists spend hours reading papers to contextualize a handful of candidate genes and deciding which leads to pursue. Pathway enrichment tools help, but they return more lists; they don't *explain*.
 
-**`omics-rag-playground`** is an experimental workbench that combines a rigorous DE pipeline (powered by PyDESeq2) with retrieval-augmented generation (RAG) grounded in the primary biomedical literature. The goal is a tool that lets a researcher ask plain-language questions over their own dataset — *"which of the upregulated genes are involved in EMT, and what's the evidence?"* — and get back answers that cite the papers they come from.
+**`omics-rag-playground`** is an experimental workbench that combines a rigorous DE pipeline (powered by PyDESeq2) with retrieval-augmented generation (RAG) grounded in the primary biomedical literature. The goal is a tool that lets a researcher ask plain-language questions over their own dataset, such as *"which of the upregulated genes are involved in EMT, and what's the evidence?"*, and get back answers that cite the papers they come from.
 
 This is a portfolio project, built in the open as I transition from quantum computing research into applied ML.
 
@@ -32,7 +32,7 @@ This is a portfolio project, built in the open as I transition from quantum comp
   <em>PCA on VST-transformed counts: PC1 (29.2%) cleanly separates treatment groups; PC2 (23.1%) captures donor-level variability.</em>
 </p>
 
-**Stage 1 — colorectal cancer DE on GSE50760** (Kim et al. 2014, via recount3):
+**Stage 1, colorectal cancer DE on GSE50760** (Kim et al. 2014, via recount3):
 
 <p align="center">
   <img src="docs/img/pca_gse50760.png" width="600" alt="GSE50760 PCA">
@@ -50,27 +50,31 @@ This is a portfolio project, built in the open as I transition from quantum comp
 
 ## Roadmap
 
-- [x] **Stage 0 — Foundations**
+- [x] **Stage 0, Foundations**
   - Warm-up on the `airway` reference dataset
   - Repo scaffolding, dependencies pinned via `uv`
-- [x] **Stage 1 — DE analysis on a real dataset**
+- [x] **Stage 1, DE analysis on a real dataset**
   - GSE50760 (colorectal cancer: primary tumor, normal mucosa, liver metastasis) via recount3
   - Single-factor and multi-factor (`~patient + condition`) designs in parallel
   - Volcano plots, exploratory PCA on VST counts, pathway enrichment (Hallmarks)
   - Documented liver-tissue confound in the metastasis-vs-tumor contrast
-- [x] **Stage 2 — Retrieval layer**
-  - PubMed abstract ingestion (Entrez API) scoped to dataset keywords
-  - Bio-aware embeddings (PubMedBERT / BioBERT) + vector store (Chroma/FAISS)
-  - Gene-annotation hooks (MyGene, GeneCards)
-- [ ] **Stage 3 — LLM reasoning layer**
-  - LangChain pipeline with retrieval, grounded prompting, citation tracking
-  - Guardrails: hallucination checks, "I don't know" fallbacks
-  - Evaluation harness (retrieval precision, answer faithfulness)
-- [ ] **Stage 4 — R Shiny frontend**
+- [x] **Stage 2, Retrieval layer**
+  - PubMed abstract ingestion via Biopython Entrez, cached by PMID
+  - Bio-aware embeddings (NeuML/pubmedbert-base-embeddings, 768-dim, L2-normalized)
+  - Persistent ChromaDB vector store with cosine space
+  - MeSH ablation documented as null result (dropped MeSH appending for Stage 3)
+- [x] **Stage 3, LLM reasoning layer** *(partial)*
+  - LangChain integration with Claude Haiku 4.5 via `langchain-anthropic`
+  - Structured output (Pydantic `GroundedAnswer`) with answer, citations, confidence, reasoning_type
+  - System prompt enforcing grounding-from-abstracts-only and explicit "no evidence" fallbacks
+  - Literature-sparse fallback that short-circuits the LLM when retrieved distances exceed a calibrated threshold
+  - Three-question demo notebook covering topic, function, and mechanism reasoning
+  - **Pending:** evaluation harness on benchmark questions (Session 5)
+- [ ] **Stage 4, R Shiny frontend**
   - Upload dataset, configure contrasts, browse results
   - Natural-language question box wired to the LLM backend
   - Exportable HTML report per session
-- [ ] **Stage 5 — Polish**
+- [ ] **Stage 5, Polish**
   - Dockerized deployment
   - Public demo (HuggingFace Spaces / Railway / Posit Connect)
   - Short technical write-up
@@ -83,6 +87,7 @@ This is a portfolio project, built in the open as I transition from quantum comp
 
 - Python 3.11
 - [`uv`](https://github.com/astral-sh/uv) (or your preferred Python package manager)
+- An [Anthropic API key](https://console.anthropic.com/) for Stage 3 (the rest of the project runs offline)
 
 ### Install
 
@@ -90,6 +95,7 @@ This is a portfolio project, built in the open as I transition from quantum comp
 git clone https://github.com/emanueledri/omics-rag-playground.git
 cd omics-rag-playground
 uv sync
+cp .env.example .env  # then fill in NCBI_EMAIL, NCBI_API_KEY, ANTHROPIC_API_KEY
 ```
 
 ### Run the warm-up notebook
@@ -97,6 +103,13 @@ uv sync
 ```bash
 uv run jupyter lab notebooks/00_warmup_airway.ipynb
 ```
+
+### Run the reasoning demo
+
+```bash
+uv run jupyter lab notebooks/03_reasoning_demo.ipynb
+```
+Note: the reasoning demo expects a populated ChromaDB collection from Stage 2. Run notebook 02 first to populate `data/processed/chroma_db/`.
 
 ---
 
@@ -123,14 +136,16 @@ omics-rag-playground/
 - **DE analysis:** [PyDESeq2](https://github.com/owkin/PyDESeq2), the scverse-compatible Python port of DESeq2
 - **Enrichment:** [gseapy](https://github.com/zqfang/GSEApy)
 - **Single-cell / AnnData interop:** [scanpy](https://scanpy.readthedocs.io/), [anndata](https://anndata.readthedocs.io/)
-- **Retrieval & LLM:** LangChain, ChromaDB, sentence-transformers (planned)
+- **PubMed retrieval:** [Biopython](https://biopython.org/) Entrez
+- **Embeddings & vector store:** [sentence-transformers](https://www.sbert.net/), [ChromaDB](https://www.trychroma.com/)
+- **LLM reasoning:** [LangChain](https://www.langchain.com/), Anthropic Claude Haiku 4.5
 - **Frontend:** R Shiny (planned)
 
 ---
 
 ## Design notes
 
-Design decisions, trade-offs, and lessons learned will be collected in [`docs/design-notes.md`](docs/design-notes.md) as the project evolves. The notes are written as I go and may contain dead ends — the point is the trail, not a polished retrospective.
+Design decisions, trade-offs, and lessons learned are collected in [`docs/design-notes.md`](docs/design-notes.md), updated per session as the project evolves. The notes are written as I go and may contain dead ends; the point is the trail, not a polished retrospective.
 
 ---
 

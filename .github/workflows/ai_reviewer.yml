@@ -1,0 +1,24 @@
+name: AI Code Reviewer
+
+on:
+  issue_comment:
+    types: [created] # Il workflow si attiva solo quando viene scritto un commento
+
+jobs:
+  review_job:
+    # Questa condizione fondamentale evita che il bot risponda ai suoi stessi commenti,
+    # attivandosi solo se il commento inizia con il comando "/"
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/') }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Run PR Agent
+        uses: Codium-ai/pr-agent@main
+        env:
+          OPENAI_KEY: ${{ secrets.OPENROUTER_KEY }}
+          OPENAI_BASE_URL: https://openrouter.ai
+          CUSTOM_MODELS.REVIEW: "deepseek/deepseek-chat" 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

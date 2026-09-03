@@ -35,8 +35,16 @@ def get_or_create_collection(db_path: str | Path = DEFAULT_DB_PATH,
     """
 
     client = PersistentClient(path=str(db_path))
-    collection = client.get_or_create_collection(name=collection_name,
-                                                 configuration=COSINE_CONFIGURATION)
+    collection = client.get_or_create_collection(
+        name=collection_name,
+        configuration=COSINE_CONFIGURATION,
+    )
+    space = collection.configuration_json["hnsw"]["space"]
+    if space != "cosine":
+        raise ValueError(
+            f"Collection {collection_name!r} uses {space!r} distance, "
+            "but cosine is required. Run scripts/rebuild_corpus.py."
+        )
 
     return collection
 

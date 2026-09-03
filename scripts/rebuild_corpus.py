@@ -89,11 +89,30 @@ def main() -> int:
     embeddings = embed_abstracts(texts, show_progress_bar=True)
 
     client = PersistentClient(path=str(DEFAULT_DB_PATH))
-    if collection_name in {c.name for c in client.list_collections()}:
-        print(f"Deleting existing collection {collection_name!r} (index space is fixed at creation)")
+    existing_names = {c.name for c in client.list_collections()}
+    temporary_name = f"{collection_name}__rebuild"
+
+    if temporary_name in existing_names:
+        client.delete_collection(temporary_name)
+
+    collection = client.create_collection(
+        name=temporary_name,
+        configuration=COSINE_CONFIGURATION,
+    )
+    try:
+        ingest_records(collection, records, embeddings, genes=genes)
+        if collection.count() != len(records):
+            raise RuntimeError(
+                f"Ingested {collection.count()} of {len(records)} records"
+            )
+    except Exception:
+        client.delete_collection(temporary_name)
+        raise
+
+    if collection_name in existing_names:
+        print(f"Replacing existing collection {collection_name!r}")
         client.delete_collection(collection_name)
-    collection = client.create_collection(name=collection_name, configuration=COSINE_CONFIGURATION)
-    ingest_records(collection, records, embeddings, genes=genes)
+    collection.modify(name=collection_name)
 
     space = collection.configuration_json["hnsw"]["space"]
     print(f"Rebuilt {collection_name!r} at {DEFAULT_DB_PATH}: {collection.count()} documents, space={space}")

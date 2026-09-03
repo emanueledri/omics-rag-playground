@@ -82,7 +82,7 @@ def _format_abstracts(records: list[dict]) -> str:
     return "\n".join(formatted_abstracts)
 
 def answer_question(query: str, collection, n_retrieved: int = 5, 
-                    distance_threshold: float = 1.15, model: str = "claude-haiku-4-5-20251001") -> ReasoningResult:
+                    distance_threshold: float = 0.55, model: str = "claude-haiku-4-5-20251001") -> ReasoningResult:
     """Answer a question using the retrieved abstracts.
 
     Parameters
@@ -96,10 +96,14 @@ def answer_question(query: str, collection, n_retrieved: int = 5,
     model : str
         Anthropic model name.
     distance_threshold : float
-        Cosine distance threshold for the literature-sparse fallback.
-        If all retrieved abstracts have distance above this, the LLM call
-        is skipped and a "no relevant literature" message is returned.
-        Baseline 1.10 calibrated on the Stage 2 / Block 3 demo queries.
+        Cosine distance (``1 - cos``) threshold for the literature-sparse
+        fallback. If all retrieved abstracts have distance above this, the LLM
+        call is skipped and a "no relevant literature" message is returned.
+        0.55 is the cosine-scale equivalent of the 1.10 baseline calibrated on
+        the Session 4 demo queries, which were measured on a store that was
+        L2-indexed and therefore reported ``2 - 2*cos`` (see design notes,
+        Session 5 / Part 1). Placeholder value: it is re-derived from the
+        evaluation harness in Part 4 and should not be trusted until then.
     """
   
     retrieved = query_collection(collection, query, embed_fn=embed_abstracts, n_results=n_retrieved)

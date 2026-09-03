@@ -1,0 +1,392 @@
+{
+  "collection_name": "pubmed_abstracts_no_mesh",
+  "embedding_model": "NeuML/pubmedbert-base-embeddings",
+  "text_template": "{title}\n\n{abstract}",
+  "n_records": 64,
+  "records": [
+    {
+      "pmid": "10891534",
+      "title": "Expression analysis and mutational screening of the epithelium-specific ets gene-1 (ESE-1) in patients with squamous anal cancer.",
+      "gene": "SPRR2A",
+      "abstract_sha256": "db3d1cb55c8f33e30cc1f52c12dce2af3e48b77d778a7f5fada4e685024a9af5"
+    },
+    {
+      "pmid": "11231887",
+      "title": "Differential expression of aquaporin 8 in human colonic epithelial cells and colorectal tumors.",
+      "gene": "AQP8",
+      "abstract_sha256": "252b4f22ebdb1023299e16c395f228b88a8c106ff3277cabadf85bdaa11ff5d2"
+    },
+    {
+      "pmid": "12057899",
+      "title": "Endometrial and colorectal tumors from patients with hereditary nonpolyposis colon cancer display different patterns of microsatellite instability.",
+      "gene": "CA7",
+      "abstract_sha256": "770f077fa0b9a5bc45d5fe0a39272deca4204ec1c328d5696545fc108bb22196"
+    },
+    {
+      "pmid": "12910694",
+      "title": "[Detection of point mutation in p53 gene by capillary electrophoresis-PCR-SSCP analysis].",
+      "gene": "CA7",
+      "abstract_sha256": "9d731c01643e7919415a51b9301ec3033ce82975474cfa01a764d2ad156eb207"
+    },
+    {
+      "pmid": "19350120",
+      "title": "Clinical significance of kallikrein-related peptidase 7 (KLK7) in colorectal cancer.",
+      "gene": "KLK7",
+      "abstract_sha256": "583f5fe8506e91edf67d2b04ca83161031daa242095b832b8e2a2ab88210a34e"
+    },
+    {
+      "pmid": "19367279",
+      "title": "The use of kallikrein-related peptidases as adjuvant prognostic markers in colorectal cancer.",
+      "gene": "KLK7",
+      "abstract_sha256": "27f876bd9dce2c2c90b2fe73985df2a44d53910b23ae8b04b67aba80df6f18be"
+    },
+    {
+      "pmid": "20544292",
+      "title": "Clinical significance of human kallikrein7 gene expression in colorectal cancer.",
+      "gene": "KLK7",
+      "abstract_sha256": "0c4309eb0ab29c4dc6cd97a53a135b2072b2af3d234ac9028cfe80453227a327"
+    },
+    {
+      "pmid": "23148732",
+      "title": "Expression of AQP5 and AQP8 in human colorectal carcinoma and their clinical significance.",
+      "gene": "AQP8",
+      "abstract_sha256": "32c4e44a8d410c2223b3fe9367625e7eb643a6a5ff7af2346530fb11b90097f8"
+    },
+    {
+      "pmid": "23224034",
+      "title": "Parallel overexpression and clinical significance of kallikrein-related peptidases 7 and 14 (KLK7KLK14) in colon cancer.",
+      "gene": "KLK7",
+      "abstract_sha256": "599ac3fd7c8477d1be834defdaf6c66215696b93f052241786301bae08120a6f"
+    },
+    {
+      "pmid": "24169962",
+      "title": "Genes with aberrant expression in murine preneoplastic intestine show epigenetic and expression changes in normal mucosa of colon cancer patients.",
+      "gene": "SPRR2A",
+      "abstract_sha256": "38164dec206d34ea7aab45a9b663f8a5025d9d1d655b33b742e436de0d4e5ada"
+    },
+    {
+      "pmid": "24224610",
+      "title": "Comparison of protein immunoprecipitation-multiple reaction monitoring with ELISA for assay of biomarker candidates in plasma.",
+      "gene": "COMP",
+      "abstract_sha256": "23b307043fa337ce20732dc5082a681a80a289927c277a8bd551c97c620d4672"
+    },
+    {
+      "pmid": "24373460",
+      "title": "Health-related quality of life after surgery for advanced and recurrent rectal cancer: a nationwide prospective study.",
+      "gene": "COMP",
+      "abstract_sha256": "9b7e862ad1566ecd5014f9398c7e11325fc573f367de5cfd8843b56c41b07999"
+    },
+    {
+      "pmid": "24959000",
+      "title": "Gene expression profiling of colorectal tumors and normal mucosa by microarrays meta-analysis using prediction analysis of microarray, artificial neural network, classification, and regression trees.",
+      "gene": "CA7; AQP8",
+      "abstract_sha256": "180800a28e12b326942d383596f17fc3658298cd82f7d6f4ef5804c62afc058a"
+    },
+    {
+      "pmid": "25153388",
+      "title": "Kallikrein-related peptidase 7 (KLK7) is a proliferative factor that is aberrantly expressed in human colon cancer.",
+      "gene": "KLK7",
+      "abstract_sha256": "ed5d8de95937eb253dff5fb1ef0fd2de1dc947ca5f25be8a7c80b0a7badbb891"
+    },
+    {
+      "pmid": "25885898",
+      "title": "Prognostic value of carbonic anhydrase VII expression in colorectal carcinoma.",
+      "gene": "CA7",
+      "abstract_sha256": "967830125c138520f31148a6fc00a75642d5f1246ba5e104463c6b83fe4a50c3"
+    },
+    {
+      "pmid": "26208990",
+      "title": "Gene-expression analysis of a colorectal cancer-specific discriminatory transcript set on formalin-fixed, paraffin-embedded (FFPE) tissue samples.",
+      "gene": "CA7",
+      "abstract_sha256": "ac6b2200d82a92c79c7714af906029c2cb6e7f724c2d5a4ce607f02b9a091260"
+    },
+    {
+      "pmid": "26361962",
+      "title": "Mouse model of proximal colon-specific tumorigenesis driven by microsatellite instability-induced Cre-mediated inactivation of Apc and activation of Kras.",
+      "gene": "AQP8",
+      "abstract_sha256": "50105446ddf4f8a7f28ff8b987fe1f7ff49c23a8faa4e8023271a98d86e8528e"
+    },
+    {
+      "pmid": "26474385",
+      "title": "Novel RNA variants in colorectal cancers.",
+      "gene": "KLK7",
+      "abstract_sha256": "00e5414777c010ced8fa16d7ededba72e9dd3965925ef0b3a357ddcf2494b84b"
+    },
+    {
+      "pmid": "29560517",
+      "title": "Cartilage oligomeric matrix protein is a prognostic factor and biomarker of colon cancer and promotes cell proliferation by activating the Akt pathway.",
+      "gene": "COMP",
+      "abstract_sha256": "711cec027a4b7f951e418db843b291e1ef3befb2342f469ae52160cdcd92f9d4"
+    },
+    {
+      "pmid": "29788743",
+      "title": "Novel insights into transcriptional dysregulation in colorectal cancer.",
+      "gene": "CA7",
+      "abstract_sha256": "9ab0f6e901b4a53554e1875c9c767b71dec0fc803744bcdda2441283619cf657"
+    },
+    {
+      "pmid": "29799470",
+      "title": "Structural Basis for Mutations of Human Aquaporins Associated to Genetic Diseases.",
+      "gene": "AQP8",
+      "abstract_sha256": "045d38689c62df48317c0a20cf812fd13b43da3641b3f8da83ed966088465c1b"
+    },
+    {
+      "pmid": "29885515",
+      "title": "Human colorectal cancer initiation is bidirectional, and cell growth, metabolic genes and transporter genes are early drivers of tumorigenesis.",
+      "gene": "CA7; AQP8",
+      "abstract_sha256": "0022ce7aada22d73da4067f6228870214190bd4921d9359b46182842a74a14d7"
+    },
+    {
+      "pmid": "29951927",
+      "title": "Identification of marker genes and pathways specific to precancerous duodenal adenomas and early stage adenocarcinomas.",
+      "gene": "KLK7",
+      "abstract_sha256": "434cf9265e2b19c47eb5c27331d0a4071bad7c0bed17e51b807793c09dc09483"
+    },
+    {
+      "pmid": "30502262",
+      "title": "COMP Gene Coexpresses With EMT Genes and Is Associated With Poor Survival in Colon Cancer Patients.",
+      "gene": "COMP",
+      "abstract_sha256": "271a318b700dfcfea475b116bf109a5ae84fa10ea7fdc24bafac8e7a574536b0"
+    },
+    {
+      "pmid": "30652071",
+      "title": "Wild-type p53 regulates OTOP2 transcription through DNA loop alteration of the promoter in colorectal cancer.",
+      "gene": "OTOP2",
+      "abstract_sha256": "6ccced0f61e2d12dbcb10a95772b00e907709f8162203be02f42722c4f1dbcd1"
+    },
+    {
+      "pmid": "30954025",
+      "title": "Colonic Mucosal Transcriptomic Changes in Patients with Long-Duration Ulcerative Colitis Revealed Colitis-Associated Cancer Pathways.",
+      "gene": "OTOP2",
+      "abstract_sha256": "4248340f0ca785aa0db7944230d7cf65da434e73071972ca7a427cb2f2043291"
+    },
+    {
+      "pmid": "30995524",
+      "title": "Increasing Incidence of Colon Cancer in the Young: Assessing the Tumor Biology.",
+      "gene": "COMP",
+      "abstract_sha256": "0256ec6809fb9355d62eef35ee857906ef6e31b91925f931caff1fd7c3d529e2"
+    },
+    {
+      "pmid": "31612869",
+      "title": "Association of a novel seven-gene expression signature with the disease prognosis in colon cancer patients.",
+      "gene": "OTOP3",
+      "abstract_sha256": "ce5ab6bd0553d415cbf099515a82efa3e309b928da2d8fff4195da993c15dfe8"
+    },
+    {
+      "pmid": "31617091",
+      "title": "Cartilage oligomeric matrix protein (COMP) promotes cell proliferation in early-onset colon cancer tumorigenesis.",
+      "gene": "COMP",
+      "abstract_sha256": "b306560403a92274df59f37e5c4f43ab50ae147411f04cc0fe9dcb65ee60a55f"
+    },
+    {
+      "pmid": "32446370",
+      "title": "Identification of the AQP8-miR-92a network associated with the aggressive traits of colorectal cancer.",
+      "gene": "AQP8",
+      "abstract_sha256": "47ce0ff611667007140cce45df00acc11d327acdeda766bdd84d32d8d23d6791"
+    },
+    {
+      "pmid": "32462020",
+      "title": "Identification and Verification of Core Genes in Colorectal Cancer.",
+      "gene": "AQP8",
+      "abstract_sha256": "52eeff3682feaac50700b14d89733bba8e68257ecd2072665c1bfc99dc04fed6"
+    },
+    {
+      "pmid": "32627312",
+      "title": "Predicting outcomes of pelvic exenteration using machine learning.",
+      "gene": "COMP",
+      "abstract_sha256": "5c242bfc04bc8b2a4c9b7995a1ee1c06bd99f95afa82279448a50bc5ab955e05"
+    },
+    {
+      "pmid": "32754278",
+      "title": "Cartilage Oligomeric Matrix Protein promotes epithelial-mesenchymal transition by interacting with Transgelin in Colorectal Cancer.",
+      "gene": "COMP",
+      "abstract_sha256": "506bee8edc42e474f1799201db931508ffb87a86bba7c97efd083fb13cede478"
+    },
+    {
+      "pmid": "33037736",
+      "title": "TRIP13 promotes metastasis of colorectal cancer regardless of p53 and microsatellite instability status.",
+      "gene": "KLK7",
+      "abstract_sha256": "f8b1ec725d8a3ea0c36ea7ea04d31befe2c6152d17da63729ab6dffdd360debd"
+    },
+    {
+      "pmid": "33713277",
+      "title": "Curcumin suppresses LGR5(+) colorectal cancer stem cells by inducing autophagy and via repressing TFAP2A-mediated ECM pathway.",
+      "gene": "COMP",
+      "abstract_sha256": "e92fb36e7c43f5173770e17c5ee6c1a450e8124c6d89ae0b05721716bad7db7a"
+    },
+    {
+      "pmid": "33990498",
+      "title": "Decreased Tumoral Expression of Colon-Specific Water Channel Aquaporin 8 Is Associated With Reduced Overall Survival in Colon Adenocarcinoma.",
+      "gene": "AQP8",
+      "abstract_sha256": "196f75f968d90d24556231ba4cd1c1789545b573c53e8af3ca7c412666773be2"
+    },
+    {
+      "pmid": "34065672",
+      "title": "Molecular Pathways Associated with Kallikrein 6 Overexpression in Colorectal Cancer.",
+      "gene": "KLK7",
+      "abstract_sha256": "ad95ac4aabec097eb86c53b7ffc96484dff8e4e061508b6fe08262deec06953f"
+    },
+    {
+      "pmid": "34153790",
+      "title": "Machine learning and network-based models to identify genetic risk factors to the progression and survival of colorectal cancer.",
+      "gene": "CA7",
+      "abstract_sha256": "73baf8e76904ff9f03688e26923e6336ca94eff145df1d7671fe054f2a27936c"
+    },
+    {
+      "pmid": "34390411",
+      "title": "Employing bioinformatics analysis to identify hub genes and microRNAs involved in colorectal cancer.",
+      "gene": "AQP8",
+      "abstract_sha256": "df03e5bd26f0f1d292a116b1c40004c94c4d9e7a2c5de74c87c3734bdf04c32c"
+    },
+    {
+      "pmid": "34477243",
+      "title": "Distinguishing colorectal adenoma from hyperplastic polyp by WNT2 expression.",
+      "gene": "OTOP3",
+      "abstract_sha256": "236ad5fe881e3df4cf9d20d3bd1048f6621dc69dc47937d6a68e2ffe49079228"
+    },
+    {
+      "pmid": "34687957",
+      "title": "Cartilage Oligomeric Matrix Protein, COMP may be a Better Prognostic Marker Than CEACAM5 and Correlates With Colon Cancer Molecular Subtypes, Tumor Aggressiveness and Overall Survival.",
+      "gene": "COMP",
+      "abstract_sha256": "41210aafb75922feaae1423c2813c334ec089b530a0826b0b0f34a254a240a16"
+    },
+    {
+      "pmid": "35058597",
+      "title": "Oncogenic potential of BEST4 in colorectal cancer via activation of PI3K/Akt signaling.",
+      "gene": "BEST4",
+      "abstract_sha256": "e5d5e6a1cf0c2065405e74da81bd01901931f2c5c4a143be18e367b19743cc36"
+    },
+    {
+      "pmid": "35114976",
+      "title": "Uncovering potential genes in colorectal cancer based on integrated and DNA methylation analysis in the gene expression omnibus database.",
+      "gene": "BEST4; CA7",
+      "abstract_sha256": "72f6155ec599fdc8963ce50574b441282f53068ae5ab6ce6abb8b4066fe53c81"
+    },
+    {
+      "pmid": "35194111",
+      "title": "Weighted correlation network analysis revealed novel long non-coding RNAs for colorectal cancer.",
+      "gene": "BEST4; AQP8",
+      "abstract_sha256": "ea6dec0bc8ec502781539e26a2bcec981d23533eb481b2c7cdb3e778fb492071"
+    },
+    {
+      "pmid": "35587572",
+      "title": "Prognosis prediction of stage IV colorectal cancer patients by mRNA transcriptional profile.",
+      "gene": "OTOP3",
+      "abstract_sha256": "7fd2268a8387b3f594e61a6aa3612eea059a81c0e0b151f1fd8e41d6db8ac8c1"
+    },
+    {
+      "pmid": "36255654",
+      "title": "Cartilage oligomeric matrix protein acts as a molecular biomarker in multiple cancer types.",
+      "gene": "COMP",
+      "abstract_sha256": "3f59cf909616ef59d4bbfc7c994d67fc4cccc652500c0c7a0b0af03b1c50a01f"
+    },
+    {
+      "pmid": "36551305",
+      "title": "TGF-β Pathways Stratify Colorectal Cancer into Two Subtypes with Distinct Cartilage Oligomeric Matrix Protein (COMP) Expression-Related Characteristics.",
+      "gene": "COMP",
+      "abstract_sha256": "592205ac873e1f68dc94d4194af6d2d112c5f7d1775331d7ced815ea62204b83"
+    },
+    {
+      "pmid": "36576616",
+      "title": "Weighted gene co-expression network analysis combined with machine learning validation to identify key hub biomarkers in colorectal cancer.",
+      "gene": "AQP8",
+      "abstract_sha256": "a2e648aff3be09747d9128b645100b7a4019f97912e2acd39a867f8ba6412da9"
+    },
+    {
+      "pmid": "36671447",
+      "title": "The Cancer-Associated Fibroblasts-Related Gene COMP Is a Novel Predictor for Prognosis and Immunotherapy Efficacy and Is Correlated with M2 Macrophage Infiltration in Colon Cancer.",
+      "gene": "COMP",
+      "abstract_sha256": "48295138f217b5df291a81efb8d7c3f845c6d2593b9bbf4a13202a2556bbc427"
+    },
+    {
+      "pmid": "36910014",
+      "title": "An epithelial-mesenchymal transition-related mRNA signature associated with the prognosis, immune infiltration and therapeutic response of colon adenocarcinoma.",
+      "gene": "COMP",
+      "abstract_sha256": "4789830f8c9bc74b327c750f686448678b5c0c9d31253931e7755fd509c2301e"
+    },
+    {
+      "pmid": "36933827",
+      "title": "Dissecting the heterogeneities of the tumor microenvironment between metastatic and nonmetastatic primary colorectal cancer patients by single-cell RNA sequencing.",
+      "gene": "KLK7",
+      "abstract_sha256": "d450dc32b1b1317c186efaf731943227dc4f95119b47aaba73837be30194297e"
+    },
+    {
+      "pmid": "36991138",
+      "title": "Characterization of butyrate-metabolism in colorectal cancer to guide clinical treatment.",
+      "gene": "COMP",
+      "abstract_sha256": "af02d691b6e53d03692f977d159d36cd547b55bb26dc8507c24a9db0507610a8"
+    },
+    {
+      "pmid": "37207219",
+      "title": "Expression of Cartilage Oligomeric Matrix Protein in colorectal cancer is an adverse prognostic factor and correlates negatively with infiltrating immune cells and PD-L1 expression.",
+      "gene": "COMP",
+      "abstract_sha256": "e0dec017641d4e81cf33490a5e5506f4bd0aaba18d1c2b119a285d40c9b775d9"
+    },
+    {
+      "pmid": "37543577",
+      "title": "Spatial tumour gene signature discriminates neoplastic from non-neoplastic compartments in colon cancer: unravelling predictive biomarkers for relapse.",
+      "gene": "OTOP2",
+      "abstract_sha256": "b69b4504bb1215d90137be4aea5812ada5241391075d882ca625c5558a8ddb5c"
+    },
+    {
+      "pmid": "37895185",
+      "title": "Unlocking the Potential of the CA2, CA7, and ITM2C Gene Signatures for the Early Detection of Colorectal Cancer: A Comprehensive Analysis of RNA-Seq Data by Utilizing Machine Learning Algorithms.",
+      "gene": "CA7",
+      "abstract_sha256": "a705df990d1077e04899a00f1ce64a46a5bc74c05f099580105fff0dd318f15b"
+    },
+    {
+      "pmid": "38767504",
+      "title": "Gene Coexpression and miRNA Regulation: A Path to Early Intervention in Colorectal Cancer.",
+      "gene": "AQP8",
+      "abstract_sha256": "1f211bb5e8896a16f70c17ec0f62db4c8a61f5ee48765ab0e5e423760f4b7d4f"
+    },
+    {
+      "pmid": "39042905",
+      "title": "Molecular pathogenesis of microsatellite instability-high early-stage colorectal adenocarcinoma in India.",
+      "gene": "COMP",
+      "abstract_sha256": "d85ce8c36a89e793eef6aa1609bf0b977681bd2593b5e2792bbc4b4ded972ded"
+    },
+    {
+      "pmid": "39162054",
+      "title": "Cancer-associated fibroblasts promote the proliferation and metastasis of colon cancer by mediating the RLIM/PML axis through paracrine COMP.",
+      "gene": "COMP",
+      "abstract_sha256": "1aef90747b6cc067a2425dc8b4ea1cc8a4596bd56976909dc982ac3b4d3d66c8"
+    },
+    {
+      "pmid": "39484215",
+      "title": "COADREADx: A comprehensive algorithmic dissection of colorectal cancer unravels salient biomarkers and actionable insights into its discrete progression.",
+      "gene": "OTOP2; OTOP3",
+      "abstract_sha256": "91506186d8d30a71db96751a444158b180454a9abb2f76814f8ea16b89b27eb5"
+    },
+    {
+      "pmid": "39644158",
+      "title": "Bioinformatics analysis of colorectal cancer transcriptomic data reveals novel prognostic signature and potential biomarker genes.",
+      "gene": "AQP8",
+      "abstract_sha256": "f069c146d6b9f804a22e4fc640ce461d7f625d283d5009253138c59183d8148d"
+    },
+    {
+      "pmid": "39699952",
+      "title": "Bestrophin-4 relays HES4 and interacts with TWIST1 to suppress epithelial-to-mesenchymal transition in colorectal cancer cells.",
+      "gene": "BEST4",
+      "abstract_sha256": "83d6dfc98646d0cf98b53cefa88c106de308f7325a3640166a0661689e81f282"
+    },
+    {
+      "pmid": "40586985",
+      "title": "OTOP3 functions as an oncogenic regulator of ferroptosis-mediated colorectal cancer progression.",
+      "gene": "OTOP3",
+      "abstract_sha256": "062ad0df31a4758dc013bef8341c2ee4869aa691c0e804c8b70361bfbb886828"
+    },
+    {
+      "pmid": "41034734",
+      "title": "Development of a prognostic risk model for colorectal cancer based on microsatellite stability-associated genes.",
+      "gene": "AQP8",
+      "abstract_sha256": "95f1f53ac430a2ea040d9681b7288397668caac24dd4ee8225cfea7853509681"
+    },
+    {
+      "pmid": "42052848",
+      "title": "From Normal Mucosa to Colorectal Cancer in Lynch Syndrome: Single-Cell Dissection of Cellular Heterogeneity and Communication Networks.",
+      "gene": "BEST4",
+      "abstract_sha256": "ee683341975e0f05dbec69238fc8e05e71900a056174f5b85c834fa506e2349d"
+    }
+  ]
+}

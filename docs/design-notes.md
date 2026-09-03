@@ -195,7 +195,7 @@ When triggered, the fallback returns a deterministic "no relevant literature fou
 
 ### Threshold calibration
 
-T = 1.10 chosen as the baseline based on the Block 3 demo queries on the Stage 2 ChromaDB collection (40 unique PMIDs from gene-symbol queries on the top DE genes of Stage 1):
+T = 1.10 chosen as the baseline based on the Block 3 demo queries on the Stage 2 ChromaDB collection (64 unique PMIDs from gene-symbol queries on the top DE genes of Stage 1):
 
 | Query | Top-5 cosine distance range | Should trigger | Triggers? |
 |---|---|---|---|
@@ -203,6 +203,12 @@ T = 1.10 chosen as the baseline based on the Block 3 demo queries on the Stage 2
 | Q2 — BEST4 role in CRC (function) | 1.094 – 1.287 | no | no |
 | Q3 — WNT signaling in CRC (mechanism) | 0.860 – 1.201 | no | no |
 | Q_OOD — HIV reverse transcriptase | (all > 1.10) | yes | yes |
+
+> **Superseded — see Session 5 / Part 1.** The column header is wrong: that store was
+> L2-indexed, so these are squared-L2 distances (`2 − 2·cos`), exactly twice the cosine
+> distance. On the cosine scale the same measurements are Q1 0.555–0.608, Q2 0.463–0.691,
+> Q3 0.430–0.600, Q_OOD 0.954–1.000, and T = 1.10 becomes **T = 0.55**. The corpus size
+> ("40 unique PMIDs" in an earlier revision) was also wrong: it has been 64 since Session 3.
 
 The chosen T = 1.10 is **empirically tight**: Q1's top-1 distance is 1.109, only 0.015 above threshold. The value is appropriate as a baseline for testing the fallback mechanism on a small (N=3) calibration set, but should be re-tuned on a larger evaluation harness in Stage 5 before being trusted in production. T is exposed as a parameter of `answer_question` to make per-call overrides easy.
 
@@ -213,3 +219,65 @@ The chosen T = 1.10 is **empirically tight**: Q1's top-1 distance is 1.109, only
 - Hard citation grounding (inline `[PMID:12345]` per claim) if soft proves insufficient
 - Multi-clause query decomposition or probabilistic reasoning_type
 - Mechanism queries that reference absent context (Q3 of the demo) — currently silently re-interpreted by the model, not flagged
+
+## Session 5: evaluation harness
+
+### Part 1: distance space, collection resolution, reproducible corpus
+
+Groundwork before anything gets measured. Four defects made every number produced so far
+untrustworthy or unreproducible.
+
+**The persisted store was L2, not cosine.** `vector_store.get_or_create_collection` passed no
+index configuration, so ChromaDB used its default `l2` space — verified via
+`collection.configuration_json['hnsw']['space']` and by an empty `collection_metadata` table in
+`chroma.sqlite3`. Because `embeddings.embed_abstracts` sets `normalize_embeddings=True`, all
+vectors are unit-norm and squared-L2 collapses to `2 − 2·cos`, i.e. **twice** the cosine
+distance. Everything downstream still ranked correctly — the two metrics are monotonically
+related — but every reported distance, and therefore the fallback threshold, was on a scale
+nobody had documented. `get_or_create_collection` now passes
+`configuration={"hnsw": {"space": "cosine"}}`.
+
+The index space is fixed when a collection is created: on an existing collection Chroma
+*silently ignores* the configuration and returns it as built (measured, no error raised). A
+metric change therefore requires deleting and re-ingesting, which is what
+`scripts/rebuild_corpus.py` does.
+
+**T: 1.10 → 0.55.** The Session 4 baseline of 1.10 was on the `2 − 2·cos` scale, so its exact
+cosine equivalent is half: 0.55. `answer_question` now defaults to 0.55 and its docstring says
+cosine. This is a mechanical conversion that preserves Session 4 behaviour, not a calibration —
+it is re-derived from the evaluation harness in Part 4 and should not be trusted before then.
+The previous *default* was 1.15 while every document said 1.10; that gap is now closed, and
+closing it changes one thing: Q1 ("EMT in CRC", top-1 0.555) now takes the deterministic
+fallback at the default threshold, where 1.15 used to let it reach the LLM. Notebook 03 already
+predicted this. The margin is 0.005 — T is still empirically tight, on the cosine scale as it
+was on the L2 one.
+
+**The Session 4 calibration numbers mostly reproduce.** Re-measured on the rebuilt cosine store:
+Q1 0.555–0.608 and Q3 0.430–0.600 double back to exactly the recorded 1.109–1.215 and
+0.860–1.201. Only Q2 drifted (recorded 1.094–1.287, now 0.927–1.383 on the same doubled scale),
+consistent with corpus growth changing which abstracts are in Q2's top-5. Trigger/no-trigger
+behaviour is unchanged for all four demo queries.
+
+**The default collection name and path did not resolve.** `DEFAULT_COLLECTION_NAME` was
+`"pubmed_abstracts"`, which has never existed in the store, and `DEFAULT_DB_PATH` was
+`../data/processed/chroma_db`, relative to `notebooks/`. Calling `get_or_create_collection()`
+with no arguments from the repo root therefore created a third, **empty** collection and
+returned it. Retrieval against it returns nothing, which every caller reads as "no relevant
+literature" — an evaluation harness built on it would report plausible fallback rates while
+measuring nothing at all. The defaults are now `pubmed_abstracts_no_mesh` and a
+`Path(__file__)`-anchored absolute path, and `query_collection` raises `ValueError` on a
+collection with `count() == 0` rather than returning an empty result set.
+
+**The corpus is now rebuildable from a clean checkout.** `data/processed/` is gitignored, so the
+vector store was previously reproducible only by re-running notebook 02 against live PubMed,
+whose result depends on what PubMed returns that day. `tests/benchmark/corpus_manifest.json`
+pins the 64 records by PMID, title, gene annotation and `sha256` of the abstract text;
+`scripts/rebuild_corpus.py` reads it, resolves records from the on-disk PubMed cache (fetching
+only PMIDs the cache lacks), verifies every hash, embeds and re-ingests, and exits non-zero on
+any mismatch. The manifest deliberately stores **no abstract text** — redistributing PubMed
+abstracts in a public repo is a licensing grey area, and hashes give integrity checking without
+it. Accepted cost: a cold rebuild needs network access and `NCBI_EMAIL`.
+
+The MeSH-ablation twin `pubmed_abstracts_with_mesh` is left on the old L2 index. It backs a
+documented null result and nothing measures against it; converting it would mean re-embedding
+for no gain.

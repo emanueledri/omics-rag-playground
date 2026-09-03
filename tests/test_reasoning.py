@@ -159,23 +159,25 @@ def test_answer_question_live_smoke(populated_collection):
     assert len(result.retrieved_pmids) == 3
 
 # --- Fallback trigger tests -------------------------------------------------
+# Thresholds and distances are on the cosine scale (``1 - cos``), which is what
+# both the fixture collection and the rebuilt production store report.
 
 
 def test_fallback_triggers_on_empty_retrieval():
     """Empty retrieval should trigger the fallback regardless of threshold."""
-    assert _should_trigger_fallback([], distance_threshold=1.10) is True
+    assert _should_trigger_fallback([], distance_threshold=0.55) is True
 
 
 def test_fallback_triggers_when_all_distances_above_threshold():
     """All distances above threshold should trigger the fallback."""
-    distances = [1.11, 1.15, 1.20]
-    assert _should_trigger_fallback(distances, distance_threshold=1.10) is True
+    distances = [0.555, 0.575, 0.60]
+    assert _should_trigger_fallback(distances, distance_threshold=0.55) is True
 
 
 def test_fallback_does_not_trigger_when_any_distance_below_threshold():
     """At least one distance below threshold should bypass the fallback."""
-    distances = [1.09, 1.15, 1.20]
-    assert _should_trigger_fallback(distances, distance_threshold=1.10) is False
+    distances = [0.545, 0.575, 0.60]
+    assert _should_trigger_fallback(distances, distance_threshold=0.55) is False
 
 
 def test_fallback_short_circuits_llm(populated_collection, monkeypatch):

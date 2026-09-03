@@ -1,0 +1,528 @@
+# Benchmark question set for the reasoning layer (Stage 3, Session 5, Part 2).
+#
+# Twenty hand-annotated questions over the frozen 64-abstract corpus described by
+# corpus_manifest.json. Ground truth is a single annotator's documented judgement,
+# not a gold standard: there is no inter-annotator agreement to report.
+#
+# Annotation procedure: all 64 titles were read as triage, then full abstracts were
+# read for every plausible candidate. Screening the whole corpus makes the |G|
+# denominator complete, so Recall@k carries no pooling bias. Residual risk: title
+# triage can miss a relevant abstract behind an uninformative title.
+#
+# relevance grades
+#   2  directly supports a claim an answer should make (the citation ground truth, S)
+#   1  topically relevant background
+#   0  irrelevant -- omitted rather than listed
+#
+# Distances quoted in `notes` are cosine distances measured against
+# pubmed_abstracts_no_mesh on 2026-09-03, for the question string exactly as written
+# here. They are recorded to make the retrieval difficulty of each item auditable;
+# they are not ground truth and Part 4 re-derives the threshold.
+
+- id: q01
+  question: "What is the role of BEST4 in colorectal cancer?"
+  reasoning_type: function
+  reference_answer: >-
+    The corpus reports two opposing roles and an answer should surface both. One study
+    finds BEST4 upregulated in CRC, correlated with advanced TNM stage, lymph node
+    metastasis and poor survival, and shows BEST4 binding the PI3K p85-alpha subunit to
+    activate Akt, MYC and CCND1, promoting proliferation and metastasis. The other finds
+    BEST4 overexpression attenuates proliferation, colony formation and mobility and
+    impedes tumour growth and liver metastasis, acting downstream of HES4 to downregulate
+    TWIST1 and suppress EMT, with low BEST4 mRNA correlated with worse prognosis.
+  relevance:
+    "35058597": 2
+    "39699952": 2
+    "35114976": 1
+    "35194111": 1
+    "42052848": 1
+  expected_confidence: [high, moderate]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    The two grade-2 abstracts contradict each other on the direction of effect. A
+    faithful answer reports the disagreement; asserting one direction alone is a
+    grounding error that only a judge will catch. Top-5 distances 0.42-0.62.
+
+- id: q02
+  question: "What is the function of AQP8 in colorectal cancer?"
+  reasoning_type: function
+  reference_answer: >-
+    AQP8 is a water channel expressed in normal colonic epithelium, in the cells facing
+    the lumen, and is a marker of normal colonocytes involved in fluid transport. It is
+    consistently downregulated in adenomas and carcinomas relative to paired normal or
+    paraneoplastic tissue. AQP8 is a direct target of miR-92a, and restoring AQP8
+    restrains CRC cell proliferation, migration and invasion in vitro and tumour growth
+    in vivo. Low tumoral AQP8 is an independent risk factor for worse overall survival.
+  relevance:
+    "11231887": 2
+    "23148732": 2
+    "32446370": 2
+    "33990498": 2
+    "24959000": 1
+    "26361962": 1
+    "29799470": 1
+    "29885515": 1
+    "32462020": 1
+    "34390411": 1
+    "35194111": 1
+    "36576616": 1
+    "38767504": 1
+    "39644158": 1
+    "41034734": 1
+  expected_confidence: [high, moderate]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    Largest relevant set in the benchmark (|G|=15), so Recall@5 is capped low by
+    construction -- 4/15 at best even with perfect ranking. This is a property of the
+    metric, not a retrieval failure, and the write-up must say so. 26361962 is graded 1
+    despite pointing the other way (Aqp8 upregulated in Kras-mutant mouse tumours).
+    Top-5 distances 0.44-0.60.
+
+- id: q03
+  question: "What is the function of KLK7 in colon cancer?"
+  reasoning_type: function
+  reference_answer: >-
+    KLK7 is a secreted serine protease that is upregulated in colon cancer relative to
+    paired normal mucosa and absent from normal epithelium. It acts as a proliferative
+    factor: overexpression in HT29 cells increases proliferation in vitro and tumour
+    growth in nude mice. It also facilitates metastasis by degrading extracellular matrix
+    components. High KLK7 expression is associated with less differentiated, more
+    advanced tumours and with shorter overall and disease-free survival, and is an
+    independent prognostic factor, particularly for liver metastasis.
+  relevance:
+    "19350120": 2
+    "20544292": 2
+    "23224034": 2
+    "25153388": 2
+    "19367279": 1
+    "26474385": 1
+    "29951927": 1
+    "33037736": 1
+    "34065672": 1
+    "36933827": 1
+  expected_confidence: [high]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    Densest well-supported item: four grade-2 abstracts all agree. The easiest question
+    in the set and a useful sanity check -- if this one scores badly, something is broken
+    upstream. Top-5 distances 0.42-0.53.
+
+- id: q04
+  question: "What is the function of CA7 in colorectal cancer?"
+  reasoning_type: function
+  reference_answer: >-
+    CA7 (carbonic anhydrase VII) is frequently downregulated in CRC at both mRNA and
+    protein level, and behaves as a tumour suppressor. Reduced CA7 correlates with poor
+    differentiation, positive lymph node metastasis, advanced TNM stage and shorter
+    disease-specific survival, and is an independent adverse prognostic indicator in
+    early stage tumours. Its downregulation is reproducible enough to serve in
+    CRC-discriminatory transcript sets and in a CA2/CA7/ITM2C early-detection signature.
+  relevance:
+    "25885898": 2
+    "26208990": 2
+    "29788743": 2
+    "37895185": 2
+    "24959000": 1
+    "29885515": 1
+    "34153790": 1
+    "35114976": 1
+  expected_confidence: [high, moderate]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    Measured failure case, deliberately kept. Top-5 distances 0.58-0.65, so this question
+    takes the deterministic fallback at T=0.55 even though four grade-2 abstracts answer
+    it and 25885898 ranks first. Spelling the symbol out ("carbonic anhydrase 7 (CA7)")
+    drops top-1 to 0.31 and the fallback does not fire -- the bare symbol is the realistic
+    phrasing for this workbench, whose input is a DE gene list. Also note two lexical
+    false positives excluded from G: in 12057899 "CA7" is a dinucleotide repeat marker and
+    in 12910694 "Ca7" is a sample label; neither concerns the gene.
+
+- id: q05
+  question: "What does OTOP3 do in colorectal cancer?"
+  reasoning_type: function
+  reference_answer: >-
+    OTOP3 is a proton channel at 17q25.1 that acts as an oncogenic regulator in CRC. It
+    drives growth by enhancing c-Myc protein stability and by suppressing ferroptosis
+    through GPX4. Silencing OTOP3 destabilises c-Myc, reduces proliferation and induces
+    ferroptosis via GPX4 reduction, ROS accumulation and lipid peroxidation, alongside
+    glycolytic shifts consistent with the Warburg effect.
+  relevance:
+    "40586985": 2
+    "31612869": 1
+    "34477243": 1
+    "35587572": 1
+    "39484215": 1
+  expected_confidence: [high, moderate]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    Measured ranking failure, deliberately kept. Top-1 at 0.51 is the OTOP2 paper
+    (30652071); the one grade-2 abstract ranks third at 0.68. The embedding does not
+    separate the OTOP2 and OTOP3 symbols, so this item measures near-miss symbol
+    confusion. |S|=1, so citation recall is all-or-nothing here.
+
+- id: q06
+  question: "How does COMP promote epithelial-mesenchymal transition in colorectal cancer?"
+  reasoning_type: mechanism
+  reference_answer: >-
+    COMP interacts with the actin-binding protein transgelin (TAGLN), and the COMP/TAGLN
+    complex regulates cytoskeletal remodelling to drive EMT: COMP overexpression promotes
+    EMT while knockdown inhibits metastasis and invasion, and the flavonoid Chrysin
+    targets the interaction interface and blocks both. Consistent with this, COMP
+    expression coexpresses with the EMT markers CDH2, FN1, VIM, TWIST1, TWIST2, SNAI1,
+    SNAI2, ZEB1, ZEB2, POSTN, MMP2, MMP9 and COL1A1, and more mesenchymal tumours carry
+    higher COMP.
+  relevance:
+    "30502262": 2
+    "32754278": 2
+    "29560517": 1
+    "30995524": 1
+    "31617091": 1
+    "36255654": 1
+    "36910014": 1
+  expected_confidence: [high]
+  expects_fallback: false
+  expected_failure: false
+  notes: "Both grade-2 abstracts rank top-2 (0.41, 0.42). Top-5 distances 0.41-0.55."
+
+- id: q07
+  question: "How does BEST4 suppress epithelial-to-mesenchymal transition in colorectal cancer cells?"
+  reasoning_type: mechanism
+  reference_answer: >-
+    BEST4 is co-expressed with HES4 in the nucleus, and HES4 signals BEST4 by binding the
+    upstream region of the BEST4 promoter. BEST4 is epistatic to HES4 and downregulates
+    TWIST1, thereby inhibiting EMT. CRISPR/Cas9 knockout of BEST4 revitalises tumour
+    growth and induces EMT, and BEST4 overexpression attenuates proliferation, colony
+    formation and mobility in vitro and tumour growth and liver metastasis in vivo.
+  relevance:
+    "39699952": 2
+    "35058597": 1
+    "42052848": 1
+  expected_confidence: [high]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    Sharpest retrieval in the set: top-1 0.36, and the next four are 0.51-0.58. |S|=1.
+    35058597 is graded 1 as background because it argues the opposite direction of effect.
+
+- id: q08
+  question: "How do cancer-associated fibroblasts promote colon cancer growth and metastasis?"
+  reasoning_type: mechanism
+  reference_answer: >-
+    CAFs act on colon cancer cells through paracrine COMP. Secreted COMP activates the
+    PI3K/AKT pathway; AKT phosphorylates and stabilises RLIM, which then ubiquitinates
+    and degrades PML, and PML overexpression inhibits the CAF-enhanced growth and
+    metastasis. COMP is also a CAF-driven prognostic gene whose upregulation tracks
+    stromal and immune activation and M2 macrophage infiltration.
+  relevance:
+    "36671447": 2
+    "39162054": 2
+    "36551305": 1
+    "36933827": 1
+    "37207219": 1
+  expected_confidence: [high, moderate]
+  expects_fallback: false
+  expected_failure: false
+  notes: "Top-5 distances 0.50-0.65; the second grade-2 abstract sits at 0.60."
+
+- id: q09
+  question: "How does wild-type p53 regulate OTOP2 expression in colorectal cancer?"
+  reasoning_type: mechanism
+  reference_answer: >-
+    Wild-type p53, but not mutant p53, regulates transcription of otop2 in CRC cells.
+    The mechanism is architectural: the otop2 promoter shows p53-dependent differences in
+    DNA loop organisation and in CTCF binding between wild-type and mutant p53 cells.
+    OTOP2 itself is downregulated in tumour tissue, its expression correlates with
+    malignancy grade and survival, and elevating it suppresses tumour proliferation
+    in vitro.
+  relevance:
+    "30652071": 2
+    "37543577": 1
+    "39484215": 1
+  expected_confidence: [high]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    Tightest single match in the benchmark: top-1 0.27, next 0.62. |S|=1, and the
+    remaining four retrieved documents at k=5 are all irrelevant, so Precision@5 is
+    capped at 0.20 -- expected, not a defect.
+
+- id: q10
+  question: "How does TRIP13 promote metastasis in colorectal cancer?"
+  reasoning_type: mechanism
+  reference_answer: >-
+    TRIP13 expression rises progressively from adenoma to carcinoma and is elevated in
+    liver metastases, independently of p53 and microsatellite instability status.
+    Knockdown impedes colony formation, invasion, motility and spheroid formation, and
+    xenografts show reduced growth and metastasis. Mechanistically TRIP13 interacts with
+    the tyrosine kinase FGFR4, which appears necessary for EGFR-AKT activation, and it
+    also engages Wnt signalling and EMT. TRIP13 is itself regulated by miR-192 and PNPT1,
+    and COL6A3, TREM2, SHC3 and KLK7 are downstream targets.
+  relevance:
+    "33037736": 2
+    "35114976": 1
+  expected_confidence: [high]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    Smallest relevant set (|G|=2), so Recall@5 is either 0.5 or 1.0 -- a coarse but valid
+    measurement. Top-1 0.38, next 0.60.
+
+- id: q11
+  question: "Which genes are downregulated in colorectal tumours compared with normal colonic mucosa?"
+  reasoning_type: topic
+  reference_answer: >-
+    Across the profiling studies in this corpus the recurrent downregulated genes are
+    colonic differentiation, transporter and metabolic genes: AQP8, CA7, CA1, CA4,
+    GUCA2A, GUCA2B, SPIB, CWH43, IL6R, ZG16, CLCA1, CLCA4, MS4A12, SLC26A3, KRT20, PYY,
+    SST, CLDN8, CEACAM7, SLC30A10, MAOA and ADH1A. Upregulated counterparts reported
+    alongside them include SPP1, TCN1, CXCL1, CXCL3, CXCL8, REG1A, MMP3, FOXQ1 and CEMIP.
+    AQP8 and CA7 recur across the largest number of independent studies.
+  relevance:
+    "24959000": 2
+    "32462020": 2
+    "34390411": 2
+    "36576616": 2
+    "39644158": 2
+    "11231887": 1
+    "23148732": 1
+    "25885898": 1
+    "26208990": 1
+    "29788743": 1
+    "29885515": 1
+    "32446370": 1
+    "33990498": 1
+    "34477243": 1
+    "35114976": 1
+    "38767504": 1
+  expected_confidence: [high, moderate]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    |G|=16. Top-1 is 24169962 at 0.43, a mouse preneoplastic-intestine methylation study
+    graded 1 -- a plausible but not directly answering hit ranked above three of the five
+    grade-2 abstracts, which is exactly the ranking error nDCG is meant to penalise.
+
+- id: q12
+  question: "Which genes are associated with microsatellite instability in colorectal cancer?"
+  reasoning_type: topic
+  reference_answer: >-
+    Two categories appear. First, the mismatch-repair machinery and its unstable target
+    loci: predisposing mutations in MLH1 and MSH2, with instability at BAT25/BAT26/BAT40
+    and at coding repeats in TGF-beta RII, MSH3, BAX and PTEN. Second, expression
+    correlates of MSI status: AXIN2, ETV4 and RNF43 as tumour-cell-specific signals and
+    COL11A1, COMP, INHBA, SPP1, MMP3 and TLR2 as immune-cell-specific signals in MSI-high
+    early-stage CRC, plus an 11-gene microsatellite-stability prognostic panel (CHGB,
+    FABP4, PLIN4, PLIN1, RPRM, C7, AQP8, C2CD4A, APLP1, ADH1B, CD36).
+  relevance:
+    "12057899": 2
+    "39042905": 2
+    "41034734": 2
+    "26361962": 1
+    "33037736": 1
+    "33990498": 1
+    "42052848": 1
+  expected_confidence: [high, moderate]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    All three grade-2 abstracts rank in the top three (0.37, 0.37, 0.42). This is the
+    question that makes 12057899 relevant rather than noise -- its "CA7" mention is a
+    repeat marker, but its MSI content genuinely answers here.
+
+- id: q13
+  question: "Which genes are involved in epithelial-mesenchymal transition in colorectal cancer?"
+  reasoning_type: topic
+  reference_answer: >-
+    COMP is the corpus's central EMT-associated gene: it coexpresses with CDH2, FN1, VIM,
+    TWIST1, TWIST2, SNAI1, SNAI2, ZEB1, ZEB2, POSTN, MMP2, MMP9 and COL1A1, and drives EMT
+    through transgelin (TAGLN). An EMT-related prognostic signature for colon
+    adenocarcinoma comprises COMP, MYL9, PCOLCE2, SCG2 and TIMP1. On the suppressive side,
+    BEST4 acts downstream of HES4 to downregulate TWIST1 and inhibit EMT.
+  relevance:
+    "30502262": 2
+    "32754278": 2
+    "36910014": 2
+    "39699952": 2
+    "33037736": 1
+    "36551305": 1
+  expected_confidence: [high, moderate]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    Retrieval is healthy here (top-1 0.42, three grade-2 abstracts in the top four),
+    which contradicts the Session 4 note that "EMT in CRC" is a corpus-thin topic. That
+    note was made against a different phrasing and a different distance scale; the
+    process-level gap it described has since been filled by the COMP papers. The
+    genuinely thin items in this benchmark are q04 and q05, not this one.
+
+- id: q14
+  question: "Which genes are part of published prognostic gene-expression signatures for colon cancer?"
+  reasoning_type: topic
+  reference_answer: >-
+    The corpus contains several independent panels with almost no overlap between them:
+    a seven-gene signature (SGCG, CLDN23, SLC4A4, CCDC78, SLC17A7, OTOP3, SMPDL3A); an
+    eight-gene stage IV panel (NEUROD1, FGF18, SFTA2, PLAC1, SAA2, DSCAML1, OTOP3); an
+    11-gene microsatellite-stability model (CHGB, FABP4, PLIN4, PLIN1, RPRM, C7, AQP8,
+    C2CD4A, APLP1, ADH1B, CD36); an EMT-related signature (COMP, MYL9, PCOLCE2, SCG2,
+    TIMP1); a machine-learning set (PRR5-ARHGAP8, CA7, NEDD4L, GFR2, ARHGAP8, SMTN,
+    OIP5); a butyrate-metabolism model whose hub targets are FN1, SERPINE1, THBS2 and
+    COMP; and COADREADx, whose prognostic panel is HOTAIR, GABRD and DKK1. OTOP3, COMP,
+    AQP8 and CA7 are the genes recurring across more than one panel.
+  relevance:
+    "31612869": 2
+    "34153790": 2
+    "35587572": 2
+    "36910014": 2
+    "36991138": 2
+    "39484215": 2
+    "41034734": 2
+    "25885898": 1
+    "29560517": 1
+    "32462020": 1
+    "33990498": 1
+    "34687957": 1
+    "37207219": 1
+    "37895185": 1
+    "39644158": 1
+  expected_confidence: [high, moderate]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    |S|=7, the largest supporting set, so citation recall is the binding constraint: a
+    correct answer citing three panels still scores 0.43. Broadest question in the set;
+    the grade-1/grade-2 line here is the least crisp anywhere in the benchmark, since
+    almost every prognostic paper mentions some gene list.
+
+- id: q15
+  question: "Which genes link the colorectal tumour microenvironment to immune-cell infiltration?"
+  reasoning_type: topic
+  reference_answer: >-
+    COMP is the gene the corpus ties most directly to immune infiltration, in both
+    directions of the same story. High COMP correlates with denser fibrosis, fewer
+    infiltrating T cells and reduced PD-L1 on tumour and immune cells, yet also with
+    enhanced stromal and immune activation and specifically with M2 macrophage and
+    cancer-associated fibroblast abundance, and it predicts immunotherapy response. Its
+    expression separates TGF-beta-pathway CRC subtypes with distinct immune
+    characteristics.
+  relevance:
+    "36551305": 2
+    "36671447": 2
+    "37207219": 2
+    "36576616": 1
+    "36910014": 1
+    "36933827": 1
+    "36991138": 1
+    "39042905": 1
+    "41034734": 1
+    "42052848": 1
+  expected_confidence: [moderate, low]
+  expects_fallback: false
+  expected_failure: false
+  notes: >-
+    Hardest non-OOD topic question: top-1 is 0.5456, just inside T=0.55, and the two
+    documents above the three grade-2 abstracts are both graded 1. A small threshold
+    change flips this item between answered and abstained, which makes it the most
+    informative single point on the risk-coverage curve.
+
+- id: q16
+  question: "Which HLA alleles confer risk for coeliac disease?"
+  reasoning_type: topic
+  reference_answer: >-
+    Out of scope. The corpus contains no abstract on coeliac disease or HLA genetics, so
+    the system should abstain rather than answer.
+  relevance: {}
+  expected_confidence: [none]
+  expects_fallback: true
+  expected_failure: false
+  notes: >-
+    Nearest OOD item after q17: top-5 distances 0.69-0.74. Immunogenetics of a
+    non-malignant gut disease -- adjacent enough in vocabulary to be a real test of the
+    threshold rather than a giveaway.
+
+- id: q17
+  question: "What is the function of the CFTR chloride channel in airway epithelium?"
+  reasoning_type: function
+  reference_answer: >-
+    Out of scope. The corpus contains no abstract on CFTR or airway epithelium, so the
+    system should abstain rather than answer.
+  relevance: {}
+  expected_confidence: [none]
+  expects_fallback: true
+  expected_failure: false
+  notes: >-
+    The hardest OOD item by design: top-5 distances 0.70-0.81. It asks about an
+    epithelial ion channel, and the corpus is full of epithelial channel and transporter
+    papers (AQP8, BEST4, OTOP2, OTOP3) -- the fallback must reject it on organ and
+    disease, not on vocabulary.
+
+- id: q18
+  question: "How do CRISPR base editors correct the sickle-cell disease point mutation?"
+  reasoning_type: mechanism
+  reference_answer: >-
+    Out of scope. The corpus contains no abstract on base editing or haemoglobinopathies;
+    CRISPR appears only as a laboratory technique in CRC functional studies. The system
+    should abstain.
+  relevance: {}
+  expected_confidence: [none]
+  expects_fallback: true
+  expected_failure: false
+  notes: >-
+    Top-5 distances 0.83-0.94. Shares the token "CRISPR" with two corpus abstracts that
+    use CRISPR/Cas9 for knockouts, which makes it a check that lexical overlap on a
+    method word does not pull the distances down.
+
+- id: q19
+  question: "Which transcription factors specify cardiomyocyte differentiation from pluripotent stem cells?"
+  reasoning_type: topic
+  reference_answer: >-
+    Out of scope. The corpus contains no abstract on cardiac development or pluripotent
+    stem cells, so the system should abstain rather than answer.
+  relevance: {}
+  expected_confidence: [none]
+  expects_fallback: true
+  expected_failure: false
+  notes: >-
+    Top-5 distances 0.80-0.91. Developmental biology in the wrong organ, phrased in the
+    same "which genes/factors do X" form as the in-corpus topic questions.
+
+- id: q20
+  question: "What is the role of BEST4 in colorectal cancer, and how does COMP promote metastasis?"
+  reasoning_type: function
+  reference_answer: >-
+    Two independent answers are required. On BEST4, the corpus reports opposing findings:
+    one study has BEST4 upregulated and oncogenic via PI3K/Akt, MYC and CCND1, the other
+    has BEST4 suppressing proliferation, mobility, liver metastasis and EMT by
+    downregulating TWIST1 downstream of HES4. On COMP, metastasis is promoted through two
+    routes: COMP secreted by cancer-associated fibroblasts activates PI3K/AKT, stabilises
+    RLIM and drives PML degradation, and tumour-cell COMP interacts with transgelin to
+    remodel the cytoskeleton and drive EMT, with knockdown suppressing invasion and
+    metastasis.
+  relevance:
+    "32754278": 2
+    "35058597": 2
+    "39162054": 2
+    "39699952": 2
+    "29560517": 1
+    "30502262": 1
+    "30995524": 1
+    "35114976": 1
+    "35194111": 1
+    "36255654": 1
+    "42052848": 1
+  expected_confidence: [moderate, low]
+  expects_fallback: false
+  expected_failure: true
+  notes: >-
+    Pre-declared failure, so it never silently moves a headline number. design-notes.md
+    records that multi-clause queries collapse to the first clause: reasoning_type is
+    annotated `function` after the leading clause, and the expected failure is answer
+    coverage, not the label. Retrieval bears this out -- both BEST4 abstracts rank top-2
+    (0.50, 0.51) while the two COMP grade-2 abstracts sit at 0.71 and outside the top
+    five, so the second clause is unlikely to be answerable from the retrieved context at
+    n=5 at all. Exclude from headline accuracy, precision, coverage and citation metrics;
+    report it separately.

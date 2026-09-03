@@ -1,13 +1,12 @@
-name: AI Code Reviewer
+name: AI Code Reviewer (DeepSeek V4 Flash)
 
 on:
   issue_comment:
-    types: [created] # Il workflow si attiva solo quando viene scritto un commento
+    types: [created]
 
 jobs:
   review_job:
-    # Questa condizione fondamentale evita che il bot risponda ai suoi stessi commenti,
-    # attivandosi solo se il commento inizia con il comando "/"
+    # Si attiva solo se il commento è dentro una Pull Request e inizia con "/"
     if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/') }}
     runs-on: ubuntu-latest
     permissions:
@@ -19,6 +18,7 @@ jobs:
         uses: Codium-ai/pr-agent@main
         env:
           OPENAI_KEY: ${{ secrets.OPENROUTER_KEY }}
-          OPENAI_BASE_URL: https://openrouter.ai
-          CUSTOM_MODELS.REVIEW: "deepseek/deepseek-chat" 
+          OPENAI_BASE_URL: https://openrouter.ai/api/v1
+          # Configurazione per usare l'ultimissimo DeepSeek V4 Flash su OpenRouter
+          CUSTOM_MODELS.REVIEW: "deepseek/deepseek-v4-flash-latest" 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

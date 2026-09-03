@@ -75,6 +75,9 @@ def main() -> int:
         if digest != entry["abstract_sha256"]:
             failures.append(f"{pmid}: abstract sha256 {digest[:12]} != manifest {entry['abstract_sha256'][:12]}")
             continue
+        if record.title != entry["title"]:
+            failures.append(f"{pmid}: title does not match manifest")
+            continue
         records.append(record)
         genes.append(entry["gene"])
 
